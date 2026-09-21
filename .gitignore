@@ -1,0 +1,11 @@
+.env
+*.pem
+*.key
+credentials
+.aws/
+__pycache__/
+venv/
+.venv/
+terraform.tfstate
+terraform.tfstate.*
+*.tfvars
