@@ -23,6 +23,9 @@ Demonstrate how an IAM execution role's permissions determine whether an AWS Lam
 
 **Explanation:** The IAM permissions change authorized the bucket-listing operation without modifying the Lambda trust policy.
 
+## Test 3 — Permission Revocation: 
+Detached LabAllowS3BucketListing from the Lambda execution role. Retested s3.list_buckets() and confirmed the result returned to DENIED: AccessDenied. This verified that removing the temporary permission restored the original authorization restriction.
+
 ## Security Findings
 - Role assumption and service API authorization are separate decisions.
 - IAM permissions should be limited to necessary actions.
