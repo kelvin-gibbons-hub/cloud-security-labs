@@ -9,17 +9,43 @@ my AI Security Architect training.
 The project demonstrates AWS identity inspection concepts,
 structured API response handling, and defensive exception handling.
 
-## Current Status
 
-Version 1 is an offline prototype.
+## Current Status — Version 2
 
-- Uses a simulated AWS STS identity response
-- Extracts Account, UserId, and Arn from a Python dictionary
-- Simulates an AWS AccessDenied response using ClientError
-- Handles the expected exception without crashing
-- Uses reusable functions and a main entry point
+Live AWS integration completed.
 
-No live AWS API calls are performed in this version.
+### Implemented Features
+
+- Temporary AWS authentication using a restricted IAM role
+- STS GetCallerIdentity inspection
+- IAM GetRole inspection for an authorized resource
+- Real-world AccessDenied verification
+- Distinct handling for unauthorized, missing, and unexpected results
+- Read-only AWS API operations
+
+### Security Controls
+
+- No hardcoded AWS access keys
+- Explicit selection of the auditor-live AWS profile
+- MFA-protected assumption of SecurityLabOperatorRole
+- Least-privilege IAM resource restrictions
+- No administrative or destructive API operations
+
+### Limitations
+
+- Auditor currently prints results to the console
+- Target role names are hardcoded for lab testing
+- Unexpected errors are not yet recorded as structured findings
+- Automated unit tests are planned
+
+### Planned Improvements
+
+- JSON audit output
+- Reusable IAM inspection functions
+- Automated tests using mocked AWS responses
+- Improved error handling and exit status codes
+- Additional read-only security checks
+
 
 ## Technologies
 
@@ -40,6 +66,9 @@ Install dependencies:
 Run:
 
     .\.venv\Scripts\python.exe identity_auditor.py
+
+Note:
+    Live execution requires a configured auditor-live profile that obtains temporary credentials through lab-operator.
 
 ## Security Design
 
