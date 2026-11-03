@@ -1,23 +1,5 @@
 import boto3
 from botocore.exceptions import ClientError
-
-
-def simulate_access_denied():
-    error_response = {
-        "Error": {
-            "Code": "AccessDenied",
-            "Message": "Not authorized to perform iam:ListUsers"
-        }
-    }
-
-    raise ClientError(error_response, "ListUsers")
-
-def test_error_handling():
-	try:
-		simulate_access_denied()
-	except ClientError as error:
-		error_code = error.response["Error"]["Code"]
-		print("Permission denied:", error_code)	
 	
 
 def display_identity(identity):
@@ -26,30 +8,61 @@ def display_identity(identity):
 	print("Role Arn:", identity["Arn"])
 
 					
+def inspect_role():
+    session = boto3.Session(profile_name="auditor-live")
+    iam = session.client("iam")
+
+    response = iam.get_role(RoleName="lab-lambda-readonly")
+    role = response["Role"]
+
+    print("\n=== IAM Role Inspection ===")
+    print("Role Name:", role["RoleName"])
+    print("Role ARN:", role["Arn"])
+    print("Created:", role["CreateDate"])
+
+
+def test_live_access_denied():
+    session = boto3.Session(profile_name="auditor-live")
+    iam = session.client("iam")
+
+    print("\n=== Least-Privilege Test ===")
+
+    try:
+        iam.get_role(RoleName="SecurityLabAdminRole")
+        print("UNEXPECTED: Restricted role inspection succeeded.")
+
+    except ClientError as error:
+        error_code = error.response["Error"]["Code"]
+
+
+    if error_code in ("AccessDenied", "AccessDeniedException"):
+    	print("PASS: Unauthorized role inspection denied.")
+    elif error_code == "NoSuchEntity":
+    	print("INCONCLUSIVE: Target IAM role not found.")
+    else:
+    	print("ERROR: Unexpected AWS error:", error_code)
+
 
 
 def identify_principal():
-	session = boto3.Session()
+	session = boto3.Session(profile_name="auditor-live")
 	sts = session.client("sts")
 
 	print("AWS Identity Auditor")
 	print("Identity inspection initialized.")
 	
-	identity = {
-        "UserId": "AROEXAMPLE:lab-session",
-        "Account": "123456789012",
-        "Arn": "arn:aws:sts::123456789012:assumed-role/SecurityLabOperatorRole/lab-session"
-    }
+	identity = sts.get_caller_identity()
 	
 	display_identity(identity)	
 
 
-
 def main():
-    print("=== AWS Identity Auditor v1 ===")
+    print("\n=== AWS Identity Auditor v1 ===")
     identify_principal()
-    test_error_handling()
+    inspect_role()
+    test_live_access_denied()
     print("Audit completed.")
 
 if __name__ == "__main__":
     main()
+
