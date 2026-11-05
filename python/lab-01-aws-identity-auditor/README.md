@@ -94,3 +94,54 @@ Note:
 - Exception handling
 - Separation of concerns
 - Least-privilege security design
+
+
+## Version 3 — Structured Security Findings
+
+The AWS Identity Auditor now generates machine-readable JSON
+reports from live AWS security checks.
+
+### Features
+
+- Retrieves the active AWS identity using STS
+- Inspects an IAM role authorized by least-privilege policy
+- Verifies that access to an unauthorized role is denied
+- Produces structured security finding dictionaries
+- Generates audit_results.json
+- Validates JSON report contents using Python assertions
+
+### Finding Classifications
+
+- PASS: Expected security behavior observed
+- FAIL: Unexpected authorization success
+- INCONCLUSIVE: Target resource not found
+- ERROR: Unexpected AWS error
+
+### Running
+
+Run the auditor:
+
+    python identity_auditor.py
+
+Validate its output:
+
+    python test_audit_report.py
+
+### Security Notes
+
+Authentication uses temporary AWS credentials through
+the auditor-live profile.
+
+The generated JSON report is excluded from version control
+because it may contain account identifiers and role ARNs.
+
+No AWS permissions are modified by the auditor.
+
+### Future Improvements
+
+- Unit tests with mocked AWS responses
+- Graceful handling of authentication failures
+- Reusable audit-check functions
+- Timestamped reports
+- Additional IAM and cloud security checks
+
