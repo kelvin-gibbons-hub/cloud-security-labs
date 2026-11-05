@@ -1,4 +1,5 @@
 import boto3
+import json
 from botocore.exceptions import ClientError
 	
 
@@ -11,37 +12,52 @@ def display_identity(identity):
 def inspect_role():
     session = boto3.Session(profile_name="auditor-live")
     iam = session.client("iam")
+    sts = session.client("sts")
 
     response = iam.get_role(RoleName="lab-lambda-readonly")
     role = response["Role"]
+    caller_id = sts.get_caller_identity()
 
-    print("\n=== IAM Role Inspection ===")
-    print("Role Name:", role["RoleName"])
-    print("Role ARN:", role["Arn"])
-    print("Created:", role["CreateDate"])
+    finding = {
+    'check': 'authorized_role_inspection',
+    'result': 'PASS',
+    'principal': caller_id["Arn"],
+    'error_code': None
+    }
+    return finding
+
 
 
 def test_live_access_denied():
     session = boto3.Session(profile_name="auditor-live")
     iam = session.client("iam")
+    sts = session.client("sts")
 
-    print("\n=== Least-Privilege Test ===")
+    user = sts.get_caller_identity()
+
+    finding = {
+        "check": "unauthorized_role_inspection",
+        "result": "ERROR",
+        "principal": user["Arn"],
+        "error_code": None
+    }
 
     try:
         iam.get_role(RoleName="SecurityLabAdminRole")
-        print("UNEXPECTED: Restricted role inspection succeeded.")
+        finding["result"] = "FAIL"
 
     except ClientError as error:
         error_code = error.response["Error"]["Code"]
+        finding["error_code"] = error_code
 
+        if error_code in ("AccessDenied", "AccessDeniedException"):
+            finding["result"] = "PASS"
+        elif error_code == "NoSuchEntity":
+            finding["result"] = "INCONCLUSIVE"
+        else:
+            finding["result"] = "ERROR"
 
-    if error_code in ("AccessDenied", "AccessDeniedException"):
-    	print("PASS: Unauthorized role inspection denied.")
-    elif error_code == "NoSuchEntity":
-    	print("INCONCLUSIVE: Target IAM role not found.")
-    else:
-    	print("ERROR: Unexpected AWS error:", error_code)
-
+    return finding
 
 
 def identify_principal():
@@ -57,11 +73,27 @@ def identify_principal():
 
 
 def main():
-    print("\n=== AWS Identity Auditor v1 ===")
+    print("\n=== AWS Identity Auditor v3 ===")
+    
     identify_principal()
-    inspect_role()
-    test_live_access_denied()
-    print("Audit completed.")
+    
+    authorized = inspect_role()
+    unauthorized = test_live_access_denied()
+    
+    report = {
+        "auditor_version": "3.0",
+        "profile": "auditor-live",
+        "checks": [authorized, unauthorized]
+    }
+    with open("audit_results.json", "w") as file:
+        json.dump(report, file, indent=4)
+
+    print("Authorized check:", authorized)
+    print("Unauthorized check:", unauthorized)    
+    print("\nAudit completed.")
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()
