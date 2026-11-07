@@ -1,6 +1,7 @@
 import boto3
 import json
 from botocore.exceptions import ClientError
+from security_checks import classify_authorization
 	
 
 def display_identity(identity):
@@ -42,22 +43,21 @@ def test_live_access_denied():
         "error_code": None
     }
 
+
     try:
         iam.get_role(RoleName="SecurityLabAdminRole")
-        finding["result"] = "FAIL"
+        finding["result"] = classify_authorization(True)
 
     except ClientError as error:
         error_code = error.response["Error"]["Code"]
-        finding["error_code"] = error_code
 
-        if error_code in ("AccessDenied", "AccessDeniedException"):
-            finding["result"] = "PASS"
-        elif error_code == "NoSuchEntity":
-            finding["result"] = "INCONCLUSIVE"
-        else:
-            finding["result"] = "ERROR"
+        finding["error_code"] = error_code
+        finding["result"] = classify_authorization(
+            False, error_code
+        )
 
     return finding
+
 
 
 def identify_principal():
@@ -73,7 +73,7 @@ def identify_principal():
 
 
 def main():
-    print("\n=== AWS Identity Auditor v3 ===")
+    print("\n=== AWS Identity Auditor v4 ===")
     
     identify_principal()
     
@@ -95,6 +95,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-if __name__ == "__main__":
-    main()
 
