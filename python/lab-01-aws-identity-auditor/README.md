@@ -145,3 +145,35 @@ No AWS permissions are modified by the auditor.
 - Timestamped reports
 - Additional IAM and cloud security checks
 
+
+## Version 4 — Automated Security Testing
+
+Refactored authorization classification into a reusable,
+AWS-independent Python module.
+
+### Improvements
+
+- Added security_checks.py for authorization classification
+- Separated AWS API operations from security decision logic
+- Added five automated tests using Python unittest
+- Verified PASS, FAIL, INCONCLUSIVE, and ERROR outcomes
+- Demonstrated regression detection through deliberate
+  defect injection and repair
+- Integrated tested classification into the live IAM auditor
+
+### Running Tests
+
+    python -m unittest -v test_security_checks
+
+### Current Limitations
+
+- AWS API failures outside the classification function
+  need additional exception handling
+- Authorized role inspection requires more negative-path tests
+- Live authentication must be refreshed when sessions expire
+- Additional mock-based AWS client tests are planned
+
+The project uses read-only AWS operations and temporary
+credentials through an MFA-protected restricted role.
+
+
