@@ -2,7 +2,20 @@ import boto3
 import json
 from botocore.exceptions import ClientError
 from security_checks import classify_authorization
-	
+from error_handling import classify_aws_exception	
+
+def run_audit_check(check_name, check_function):
+    try:
+        return check_function()
+
+    except Exception as error:
+        finding = classify_aws_exception(error)
+
+        finding["check"] = check_name
+        finding["principal"] = None
+
+        return finding
+
 
 def display_identity(identity):
 	print("UserId:", identity["UserId"])
@@ -72,13 +85,22 @@ def identify_principal():
 	display_identity(identity)	
 
 
+
+
 def main():
-    print("\n=== AWS Identity Auditor v4 ===")
+    print("\n=== AWS Identity Auditor v5 ===")
     
-    identify_principal()
-    
-    authorized = inspect_role()
-    unauthorized = test_live_access_denied()
+    #identify_principal()
+       
+    authorized = run_audit_check(
+    "authorized_role_inspection",
+    inspect_role
+    )
+
+    unauthorized = run_audit_check(
+    "unauthorized_role_inspection",
+    test_live_access_denied
+    )
     
     report = {
         "auditor_version": "3.0",
@@ -94,5 +116,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
