@@ -176,4 +176,27 @@ AWS-independent Python module.
 The project uses read-only AWS operations and temporary
 credentials through an MFA-protected restricted role.
 
+## Version 5 — Resilient AWS Error Handling
+
+Added reusable exception classification and an audit execution
+wrapper to prevent individual AWS failures from terminating
+the entire audit.
+
+### Features
+
+- Classifies missing credentials and credential retrieval failures
+- Identifies AWS endpoint connection errors
+- Preserves AWS service error codes
+- Distinguishes operational ERROR results from security findings
+- Records structured errors with check names
+- Includes five offline exception-handling tests
+- Verifies safe behavior using simulated authentication failures
+
+### Limitations
+
+- The execution wrapper catches exceptions at the audit boundary
+- The auditor does not yet implement automatic retries
+- Unexpected exceptions are classified but not fully diagnosed
+- Additional structured identity and logging improvements are planned
+
 
