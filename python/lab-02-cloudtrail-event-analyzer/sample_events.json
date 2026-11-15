@@ -1,0 +1,53 @@
+
+{
+  "Records": [
+    {
+      "eventTime": "2026-11-10T07:18:20Z",
+      "eventSource": "cloudtrail.amazonaws.com",
+      "eventName": "StopLogging",
+      "userIdentity": {
+        "arn": "arn:aws:sts::111122223333:assumed-role/AppDeployRole/deploy-job-104"
+      },
+      "requestParameters": {
+        "name": "ProductionTrail"
+      },
+      "errorCode": "AccessDenied"
+    },
+    {
+      "eventTime": "2026-11-10T07:14:03Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "AttachRolePolicy",
+      "userIdentity": {
+        "arn": "arn:aws:sts::111122223333:assumed-role/OperationsRole/alex-session"
+      },
+      "requestParameters": {
+        "roleName": "AppDeployRole",
+        "policyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+      }
+    },
+    {
+      "eventTime": "2026-11-10T07:09:12Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "GetRole",
+      "userIdentity": {
+        "arn": "arn:aws:sts::111122223333:assumed-role/OperationsRole/alex-session"
+      },
+      "requestParameters": {
+        "roleName": "AppDeployRole"
+      }
+    },
+    {
+      "eventTime": "2026-11-10T07:13:40Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "PutRolePolicy",
+      "userIdentity": {
+        "arn": "arn:aws:sts::111122223333:assumed-role/OperationsRole/alex-session"
+      },
+      "requestParameters": {
+        "roleName": "AppDeployRole",
+        "policyName": "EmergencyAdmin"
+      },
+      "errorCode": "AccessDenied"
+    }
+  ]
+}
