@@ -50,6 +50,11 @@ adversarial_policy = {
     ]
 }
 
+assert evaluate_policy(
+    adversarial_policy,
+    "s3:GetObject",
+    "arn:aws:s3:::financial-records/public-report.csv"
+) == "DENY"
 
 s3_policy = {
     "Statement": [
