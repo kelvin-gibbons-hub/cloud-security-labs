@@ -107,8 +107,8 @@ The evaluator was tested against synthetic policies covering matching Allows, ex
 | Test | Scenario | Expected Decision | Reported Result |
 |---|---|---|---|
 | A | Read explicitly protected S3 object | DENY | PASS |
-| B | Read S3 object covered by broad Allow | ALLOW | PASS |
-| C | List S3 bucket covered by broad Allow | ALLOW | PASS |
+| B | Read S3 object covered by broad Allow | DENY | PASS |
+| C | List S3 bucket covered by broad Allow | DENY | PASS |
 | D | Update code of approved Lambda function | ALLOW | PASS |
 | E | Attempt Lambda configuration update without matching permission | IMPLICIT_DENY | PASS |
 | G | Conflicting broad Allow and explicit Deny | DENY | PASS |
